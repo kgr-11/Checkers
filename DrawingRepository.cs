@@ -110,6 +110,8 @@ namespace Checkers
             float heightCell = (float)heightPlace / 8;
 
             //заливка поля
+            using (Pen penForPossibleStep = new Pen(Color.FromArgb(255, 102, 255, 0), 2.0f))
+            using (Brush brushForPossibleStep = new SolidBrush(Color.FromArgb(255, 102, 255, 0)))
             using (Pen penForWhiteCheckers = new Pen(Color.FromArgb(255, 168, 163, 153), 2.0f))
             using (Brush brushForWhiteChekers = new SolidBrush(Color.FromArgb(255, 255, 255, 255)))
             using (Pen penForBlackCheckers = new Pen(Color.FromArgb(255, 77, 77, 77), 2.0f))
@@ -130,12 +132,16 @@ namespace Checkers
                         {
                             DrawingCheker(g, brushForWhiteChekers, penForWhiteCheckers, x, y, widthCell);
                         }
+                        else if (game_place[i, j] == 2 || game_place[i, j] == -2)
+                        {
+                            DrawingCheker(g, brushForPossibleStep, penForPossibleStep, x, y, widthCell);
+                        }
                     }
                 }
             }
         }
 
-        //функция рисует возможные ходы для выбранной шашки
+        //функция рисует чей сейчас ход
         public static void DrawingCurrentStep(Graphics g, int size, bool IsWhite)
         {
             if (IsWhite)

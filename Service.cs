@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace Checkers
         {
             set { current_step = value; }
         }
-
+        bool whiteBottom;
         public Service(bool whiteBottom)
         {
             game_place = new int[8, 8];
@@ -86,6 +87,7 @@ namespace Checkers
             }
             this.countWhite = countWhite;
             this.countBlack= countBlack;
+            this.whiteBottom = whiteBottom;
         }
 
         public void DrawingGamePlace(Graphics g, int widthPlace, int heightPlace)
@@ -108,12 +110,41 @@ namespace Checkers
             }
         }
 
-        public void CoordCursorInNumberCell(Point cursor, int sizePlace, out int i,out int j)
+        private void CoordCursorInNumberCell(Point cursor, int sizePlace, out int i,out int j)
         {
             //размеры клетки
             float sizeCell = (float)sizePlace / 8;
             i = (int)(cursor.Y / sizeCell);
             j = (int)(cursor.X / sizeCell);
+        }
+        public bool CheckPossibleStep(Point cursor, int sizePlace)
+        {
+            //определяем индексы клетки в матрице игры
+            CoordCursorInNumberCell(cursor, sizePlace, out int i_index, out int j_index);
+
+            //проверка 1 - эта клетка с шашкой?
+            if (game_place[i_index, j_index]==0)
+                return false;
+
+            //проверка 2 - эта шашка цвета текущего хода?
+            if (game_place[i_index, j_index]!=current_step)
+                return false;
+
+            
+        }
+
+        
+
+        public void ResetPossibleStep()
+        {
+            for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
+            {
+                for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
+                {
+                    if (game_place[i, j] == 2 || game_place[i,j]==-2)
+                        game_place[i,j] = 0;
+                }
+            }
         }
     }
 }

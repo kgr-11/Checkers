@@ -5,12 +5,14 @@ namespace Checkers
     {
         Service service;
         bool whiteBottom;
+        bool IsBeginGame;
         public Form1()
         {
             InitializeComponent();
             whiteBottom = true;//белые всегда начинают снизу 
             service = new Service(whiteBottom);
             button_reset.Enabled = false;
+            IsBeginGame = false;
         }
 
         private void pictureBox_place_Paint(object sender, PaintEventArgs e)
@@ -55,6 +57,7 @@ namespace Checkers
             button_reset.Enabled = true;
             button_game_start.Enabled = false;
             checkBox_bot.Enabled = false;
+            IsBeginGame = true;
         }
 
         private void button_reset_Click(object sender, EventArgs e)
@@ -70,11 +73,24 @@ namespace Checkers
             button_game_start.Enabled = true;
             checkBox_bot.Enabled = true;
             checkBox_bot.Checked = false;
+            IsBeginGame= false;
         }
 
         private void pictureBox_place_MouseClick(object sender, MouseEventArgs e)
         {
-            service.CoordCursorInNumberCell(e.Location, pictureBox_place.Width, out int i,out int j);
+            //проверка начала игры, если игра не начиналась -> выходим
+            if (!IsBeginGame)
+                return;
+            //сброс возможного хода, если до этого что-то выбранно было
+            service.ResetPossibleStep();
+            //проверка выбранного хода, можно ли ходить этой шашкой
+            if (!service.CheckPossibleStep(e.Location, pictureBox_place.Width))
+                return;
+            //заполняем матрицу нужными ходами(меняем значения на временные)
+
+
+            //отдаем на отрисовку
+            pictureBox_place.Invalidate();
         }
     }
 }
