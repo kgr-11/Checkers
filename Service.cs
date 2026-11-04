@@ -36,7 +36,6 @@ namespace Checkers
         }
         public void ResetGamePlace(bool whiteBottom)
         {
-            //whiteBottom==true - снизу белые, иначе снизу черные
             int countBlack = 0;
             int countWhite = 0; 
             for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
@@ -95,66 +94,6 @@ namespace Checkers
             DrawingRepository.DrawingGamePlace(g, widthPlace, heightPlace);
             //отрисовываем шашки
             DrawingRepository.DrawingChekers(g, game_place, widthPlace, heightPlace);
-        }
-
-        public void SearchPossibleStep(bool whiteBottom)
-        {
-            if (whiteBottom)
-            {
-                if (current_step == -1)//ход черных, они сверху
-                {
-                    //если шашкой можно сходить, ставим ее в соответ состояние 
-                    for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
-                    {
-                        for (int j = 0; j < game_place.GetUpperBound(1); j++)
-                        {
-                            //для четных(для массива) строк и четных ячеек
-                            if (i % 2 == 0 && j%2== 0)
-                            {
-                                //смотрим, можно ли с текущей клетки съесть
-                                if (j + 1 <= game_place.GetUpperBound(1))
-                                {
-                                    if (game_place[i + 1, j + 1] == 1)
-                                        game_place[i, j] = -2;
-                                }
-                            }
-                            //для нечетных строк
-                            if (i % 2 != 0 && j % 2 != 0)
-                            {
-
-                            }
-                        }
-                    }
-
-                }
-                else if (current_step == 1)
-                {
-
-                }
-            }
-            else
-            {
-                if (current_step == -1)
-                {
-
-
-                }
-                else if (current_step == 1)
-                {
-
-                }
-            }
-        }
-        public void DrawingCurrentStep(Graphics g, int widthPlace, int heightPlace)
-        {
-            if (current_step == 1)
-            {
-                DrawingRepository.DrawingCurrentStep(g, widthPlace, true);
-            }
-            else if (current_step == -1)
-            {
-                DrawingRepository.DrawingCurrentStep(g, widthPlace, false);
-            }
         }
     }
 }

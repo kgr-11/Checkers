@@ -78,6 +78,7 @@ namespace Checkers
             }
         }
 
+        //функция рисования одной шашки, которую вызывает функция, которая отрисовывает все шашки доски
         private static void DrawingCheker(Graphics g,Brush brush,Pen pen,
             float x, float y,float size)
         {
@@ -100,6 +101,8 @@ namespace Checkers
             g.DrawEllipse(pen, (float)(x + ((size - D3) / 2)),
                 (float)(y + ((size - D3) / 2)), D3, D3);
         }
+
+        //отрисовка всех шашек доски на текущих клетках
         public static void DrawingChekers(Graphics g, int[,]game_place, int widthPlace, int heightPlace)
         {
             //размеры клетки
@@ -132,6 +135,7 @@ namespace Checkers
             }
         }
 
+        //функция рисует возможные ходы для выбранной шашки
         public static void DrawingCurrentStep(Graphics g, int size, bool IsWhite)
         {
             if (IsWhite)

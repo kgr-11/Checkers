@@ -8,7 +8,7 @@ namespace Checkers
         public Form1()
         {
             InitializeComponent();
-            whiteBottom = true;
+            whiteBottom = true;//белые всегда начинают снизу 
             service = new Service(whiteBottom);
             button_reset.Enabled = false;
         }
