@@ -67,6 +67,7 @@
             pictureBox_place.TabIndex = 0;
             pictureBox_place.TabStop = false;
             pictureBox_place.Paint += pictureBox_place_Paint;
+            pictureBox_place.MouseClick += pictureBox_place_MouseClick;
             // 
             // groupBox2
             // 

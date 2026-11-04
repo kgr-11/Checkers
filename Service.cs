@@ -95,5 +95,25 @@ namespace Checkers
             //отрисовываем шашки
             DrawingRepository.DrawingChekers(g, game_place, widthPlace, heightPlace);
         }
+
+        public void DrawingCurrentStep(Graphics g, int widthPlace, int heightPlace)
+        {
+            if (current_step == 1)
+            {
+                DrawingRepository.DrawingCurrentStep(g, widthPlace, true);
+            }
+            else if (current_step == -1)
+            {
+                DrawingRepository.DrawingCurrentStep(g, widthPlace, false);
+            }
+        }
+
+        public void CoordCursorInNumberCell(Point cursor, int sizePlace, out int i,out int j)
+        {
+            //размеры клетки
+            float sizeCell = (float)sizePlace / 8;
+            i = (int)(cursor.Y / sizeCell);
+            j = (int)(cursor.X / sizeCell);
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace Checkers
             pictureBox_place.Invalidate();
             pictureBox_current_step.Invalidate();
             button_reset.Enabled = true;
-            button_game_start.Enabled= false;
+            button_game_start.Enabled = false;
             checkBox_bot.Enabled = false;
         }
 
@@ -66,10 +66,15 @@ namespace Checkers
             textBox_countWhite.Text = "";
             pictureBox_place.Invalidate();
             pictureBox_current_step.Invalidate();
-            button_reset.Enabled= false;
-            button_game_start.Enabled= true;
+            button_reset.Enabled = false;
+            button_game_start.Enabled = true;
             checkBox_bot.Enabled = true;
-            checkBox_bot.Checked=false;
+            checkBox_bot.Checked = false;
+        }
+
+        private void pictureBox_place_MouseClick(object sender, MouseEventArgs e)
+        {
+            service.CoordCursorInNumberCell(e.Location, pictureBox_place.Width, out int i,out int j);
         }
     }
 }
