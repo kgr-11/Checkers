@@ -28,6 +28,7 @@ namespace Checkers
         public int CurrentStep
         {
             set { current_step = value; }
+            get { return current_step; }
         }
         public Service()
         {
@@ -226,15 +227,26 @@ namespace Checkers
             }
             return false;
         }
-
+        Node choiceNode;
         //функция срабатывает после всех проверок
         //устанавливает временные значения как возможные ходы, если эта функция вызвалась, значит они точно есть
         public void SetPossibleStep(Point cursor, int sizePlace)
         {
             //определяем индексы клетки в матрице игры
             CoordCursorInNumberCell(cursor, sizePlace, out int i_index, out int j_index);
-
             var checker = game_place[i_index, j_index];
+            choiceNode = checker;
+            bool flag = false;
+            foreach (var neighbor in checker.neighbors)
+            {
+                if (neighbor.Value == -1 * current_step)
+                {
+                    flag = true;
+                    SetStepForKill(checker);
+                }
+            }
+            if (flag)
+                return;
             foreach (var neighbor in checker.neighbors)
             {
                 if (neighbor.Value == 0)
@@ -249,14 +261,6 @@ namespace Checkers
                             neighbor.Value = 2;
                     }
                 }
-                else if (neighbor.Value == current_step)
-                {
-                    continue;
-                }
-                else if (neighbor.Value == -1 * current_step)
-                {
-                    SetStepForKill(checker);
-                }
             }
 
         }
@@ -265,7 +269,7 @@ namespace Checkers
         {
             foreach (var neighbor in checker.neighbors)
             {
-                if (neighbor.Value == 0 || neighbor.Value == current_step)
+                if (neighbor.Value!=current_step*-1)
                     continue;
                 //дошли до сюда -> сосед соперник- не важно с какой стороны, рубим в любую
                 //мультирубка сейчас не анализируется, надо просто ответить можно рубить или нет
@@ -284,7 +288,146 @@ namespace Checkers
                 }
             }
         }
-
+        //принимает сразу допустимые комбинации клавиш
+        public void MakeMove(Keys key1, Keys key2)
+        {
+            if (choiceNode is null)
+            {
+                return;
+            }
+            choiceNode.IndexInMtx(out int i, out int j);
+            //вверх-влево
+            if (key1 == Keys.Up && key2 == Keys.Left ||
+                key1 == Keys.Left && key2 == Keys.Up)
+            {
+                while (i >= 0 && j >= 0)
+                {
+                    if (game_place[i,j].Value==2|| game_place[i, j].Value == -2) 
+                    {
+                        if (current_step == -1)
+                        {
+                            game_place[i, j].Value = -1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number-choiceNode.Number)>9)
+                            {
+                                game_place[i+1, j+1].Value = 0;
+                                countWhite--;
+                            }
+                        }
+                        else
+                        {
+                            game_place[i, j].Value = 1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
+                            {
+                                game_place[i + 1, j + 1].Value = 0;
+                                countBlack--;
+                            }
+                        }
+                        break;
+                    }
+                    i--;j--;
+                }
+            }
+            //вверх-вправо
+            else if (key1 == Keys.Up && key2 == Keys.Right ||
+                key1 == Keys.Right && key2 == Keys.Up)
+            {
+                while (i >= 0 && j<=game_place.GetUpperBound(1))
+                {
+                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
+                    {
+                        if (current_step == -1)
+                        {
+                            game_place[i, j].Value = -1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
+                            {
+                                game_place[i + 1, j - 1].Value = 0;
+                                countWhite--;
+                            }
+                        }
+                        else
+                        {
+                            game_place[i, j].Value = 1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
+                            {
+                                game_place[i + 1, j - 1].Value = 0;
+                                countBlack--;
+                            }
+                        }
+                        break;
+                    }
+                    i--; j++;
+                }
+            }
+            //вниз-влево
+            else if (key1 == Keys.Down && key2 == Keys.Left ||
+                key1 == Keys.Left && key2 == Keys.Down)
+            {
+                while (i<=game_place.GetUpperBound(0) && j >= 0)
+                {
+                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
+                    {
+                        if (current_step == -1)
+                        {
+                            game_place[i, j].Value = -1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
+                            {
+                                game_place[i - 1, j + 1].Value = 0;
+                                countWhite--;
+                            }
+                        }
+                        else
+                        {
+                            game_place[i, j].Value = 1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
+                            {
+                                game_place[i - 1, j + 1].Value = 0;
+                                countBlack--;
+                            }
+                        }
+                        break;
+                    }
+                    i++; j--;
+                }
+            }
+            //вниз-вправо
+            else
+            {
+                while (i <=game_place.GetUpperBound(0) && j <=game_place.GetUpperBound(1))
+                {
+                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
+                    {
+                        if (current_step == -1)
+                        {
+                            game_place[i, j].Value = -1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
+                            {
+                                game_place[i - 1, j - 1].Value = 0;
+                                countWhite--;
+                            }
+                        }
+                        else
+                        {
+                            game_place[i, j].Value = 1;
+                            choiceNode.Value = 0;
+                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
+                            {
+                                game_place[i - 1, j - 1].Value = 0;
+                                countBlack--;
+                            }
+                        }
+                        break;
+                    }
+                    i++; j++;
+                }
+            }
+        }
 
         public void ResetPossibleStep()
         {

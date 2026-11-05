@@ -208,6 +208,8 @@
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Игра \"Шашки\"";
+            KeyDown += Form1_KeyDown;
+            KeyUp += Form1_KeyUp;
             groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox_place).EndInit();
             groupBox2.ResumeLayout(false);
