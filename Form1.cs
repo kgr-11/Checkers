@@ -4,13 +4,11 @@ namespace Checkers
     public partial class Form1 : Form
     {
         Service service;
-        bool whiteBottom;
         bool IsBeginGame;
         public Form1()
         {
             InitializeComponent();
-            whiteBottom = true;//белые всегда начинают снизу 
-            service = new Service(whiteBottom);
+            service = new Service();
             button_reset.Enabled = false;
             IsBeginGame = false;
         }
@@ -34,10 +32,7 @@ namespace Checkers
 
         private void button_game_start_Click(object sender, EventArgs e)
         {
-            //генерируем, где стоят белые-сверху/снизу
-            Random random = new Random();
-            whiteBottom = random.Next(2) == 1;//1 - значит белые снизу -> true
-            if (checkBox_bot.Checked)
+            /*if (checkBox_bot.Checked)
             {
                 if (whiteBottom)
                 {
@@ -47,8 +42,8 @@ namespace Checkers
                 {
                     MessageBox.Show("Бот начинает игру!");
                 }
-            }
-            service.ResetGamePlace(whiteBottom);
+            }*/
+            service.ResetGamePlace();
             service.CurrentStep = 1;
             textBox_countBlack.Text = service.CountBlack.ToString();
             textBox_countWhite.Text = service.CountWhite.ToString();
@@ -62,8 +57,7 @@ namespace Checkers
 
         private void button_reset_Click(object sender, EventArgs e)
         {
-            whiteBottom = true;
-            service.ResetGamePlace(whiteBottom);
+            service.ResetGamePlace();
             service.CurrentStep = 0;
             textBox_countBlack.Text = "";
             textBox_countWhite.Text = "";
@@ -78,16 +72,20 @@ namespace Checkers
 
         private void pictureBox_place_MouseClick(object sender, MouseEventArgs e)
         {
-            //проверка начала игры, если игра не начиналась -> выходим
+            //проверка начала игры, если игра не начaлась -> выходим
             if (!IsBeginGame)
                 return;
-            //сброс возможного хода, если до этого что-то выбранно было
+            //сброс возможного хода, если до этого что-то выбрано было
             service.ResetPossibleStep();
             //проверка выбранного хода, можно ли ходить этой шашкой
             if (!service.CheckPossibleStep(e.Location, pictureBox_place.Width))
+            {
+                pictureBox_place.Invalidate();
                 return;
-            //заполняем матрицу нужными ходами(меняем значения на временные)
+            }
 
+            //заполняем матрицу нужными ходами(меняем значения на временные)
+            service.SetPossibleStep(e.Location, pictureBox_place.Width);
 
             //отдаем на отрисовку
             pictureBox_place.Invalidate();
