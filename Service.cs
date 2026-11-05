@@ -17,7 +17,7 @@ namespace Checkers
         //1 - белая ячейка
         // 2 возможный ход белых
         // 100 дамка белая
-        int[,] game_place;
+        Node[,] game_place;
         int current_step;
         int countWhite;
         int countBlack;
@@ -32,24 +32,26 @@ namespace Checkers
         bool whiteBottom;
         public Service(bool whiteBottom)
         {
-            game_place = new int[8, 8];
+            game_place = new Node[8, 8];
             ResetGamePlace(whiteBottom);
         }
         public void ResetGamePlace(bool whiteBottom)
         {
             int countBlack = 0;
             int countWhite = 0; 
+            //создаем все узлы и игровое поле
             for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
             {
                 for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
                 {
+                    game_place[i, j] = new Node(0);
                     if (countBlack < 12)
                     {
                         if (whiteBottom)//черные сверху
                         {
                             if ((j + 1) % 2 == 0 && (i + 1) % 2 != 0|| (j + 1) % 2 != 0 && (i + 1) % 2 == 0)
                             {
-                                game_place[i, j] = -1;
+                                game_place[i, j] = new Node(-1);
                                 countBlack++;
                             }
                         }
@@ -58,7 +60,7 @@ namespace Checkers
                             if ((j + 1) % 2 != 0 && (game_place.GetUpperBound(0)-i + 1) % 2 == 0 ||
                                 (j + 1) % 2 == 0 && (game_place.GetUpperBound(0) - i + 1) % 2 != 0)
                             {
-                                game_place[game_place.GetUpperBound(0) - i, j] = -1;
+                                game_place[game_place.GetUpperBound(0) - i, j] = new Node(-1);
                                 countBlack++;
                             }
                         }
@@ -70,7 +72,7 @@ namespace Checkers
                             if ((j + 1) % 2 != 0 && (game_place.GetUpperBound(0) - i + 1) % 2 == 0 ||
                                 (j + 1) % 2 == 0 && (game_place.GetUpperBound(0) - i + 1) % 2 != 0)
                             {
-                                game_place[game_place.GetUpperBound(0) - i, j] = 1;
+                                game_place[game_place.GetUpperBound(0) - i, j] = new Node(1);
                                 countWhite++;
                             }
                         }
@@ -78,11 +80,46 @@ namespace Checkers
                         {
                             if ((j + 1) % 2 == 0 && (i + 1) % 2 != 0 || (j + 1) % 2 != 0 && (i + 1) % 2 == 0)
                             {
-                                game_place[i, j] = 1;
+                                game_place[i, j] = new Node(1);
                                 countWhite++;
                             }
                         }
                     }
+                }
+            }
+            //настраиваем связи
+            for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
+            {
+                for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
+                {
+                    //верхняя строка - добавляем соседей cо строки ниже
+                    if (i == 0 && j % 2 != 0)
+                    {
+                        if (j - 1 >= 0)
+                            game_place[i, j].neighbors.Add(game_place[i + 1, j - 1]);
+                        if (j + 1 <= game_place.GetUpperBound(1))
+                            game_place[i, j].neighbors.Add(game_place[i + 1, j + 1]);
+                    }
+                    else if (i == game_place.GetUpperBound(0) && j % 2 == 0)//нижняя строка -добавляем соседей со строки выше
+                    {
+                        if (j - 1 >= 0)
+                            game_place[i, j].neighbors.Add(game_place[i - 1, j - 1]);
+                        if (j + 1 <= game_place.GetUpperBound(1))
+                            game_place[i, j].neighbors.Add(game_place[i - 1, j + 1]);
+                    }
+                    else if (i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0)//у этих соседи и сверху, и снизу
+                    {
+                        if (j - 1 >= 0)
+                        {
+                            game_place[i, j].neighbors.Add(game_place[i + 1, j - 1]);
+                            game_place[i, j].neighbors.Add(game_place[i - 1, j - 1]);
+                        }
+                        if (j + 1 <= game_place.GetUpperBound(1))
+                        {
+                            game_place[i, j].neighbors.Add(game_place[i + 1, j + 1]);
+                            game_place[i, j].neighbors.Add(game_place[i - 1, j + 1]);
+                        }
+                    }  
                 }
             }
             this.countWhite = countWhite;
@@ -94,8 +131,12 @@ namespace Checkers
         {
             //отрисовываем игровое поле
             DrawingRepository.DrawingGamePlace(g, widthPlace, heightPlace);
+            int[,] place= new int[8,8];
+            for(int i=0;i<8;i++)
+                for(int j=0;j<8;j++)
+                    place[i,j] =game_place[i,j].Value;
             //отрисовываем шашки
-            DrawingRepository.DrawingChekers(g, game_place, widthPlace, heightPlace);
+            DrawingRepository.DrawingChekers(g, place, widthPlace, heightPlace);
         }
 
         public void DrawingCurrentStep(Graphics g, int widthPlace, int heightPlace)
@@ -119,7 +160,7 @@ namespace Checkers
         }
         public bool CheckPossibleStep(Point cursor, int sizePlace)
         {
-            //определяем индексы клетки в матрице игры
+            /*//определяем индексы клетки в матрице игры
             CoordCursorInNumberCell(cursor, sizePlace, out int i_index, out int j_index);
 
             //проверка 1 - эта клетка с шашкой?
@@ -130,21 +171,22 @@ namespace Checkers
             if (game_place[i_index, j_index]!=current_step)
                 return false;
 
-            
+            */
+            return true;
         }
 
         
 
         public void ResetPossibleStep()
         {
-            for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
+            /*for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
             {
                 for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
                 {
                     if (game_place[i, j] == 2 || game_place[i,j]==-2)
                         game_place[i,j] = 0;
                 }
-            }
+            }*/
         }
     }
 }

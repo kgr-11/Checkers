@@ -9,13 +9,12 @@ namespace Checkers
 {
     public class Node
     {
-        public int Number { get; init; }
         public List<Node> neighbors;
         public int Value { get; set; }
-        public Node(int value, int number)
+        public Node(int value)
         {
-            Number = number;
             Value = value;
+            neighbors = new List<Node>();
         }
     }
 }
