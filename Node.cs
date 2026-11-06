@@ -11,12 +11,14 @@ namespace Checkers
     {
         public List<Node> neighbors;
         public int Value { get; set; }
+        public bool IsKing { get; set; }
         public int Number { get; init; }
         public Node(int value, int number)
         {
             Value = value;
             neighbors = new List<Node>();
             Number = number;
+            IsKing = false;
         }
         public static bool IsSameDiagonal(Node node1, Node node2)
         {

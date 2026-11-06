@@ -81,7 +81,6 @@ namespace Checkers
             this.Focus();//возвращаем фокус форме
         }
 
-        //обработчик выбора шашки
         private void pictureBox_place_MouseClick(object sender, MouseEventArgs e)
         {
             //проверка начала игры, если игра не начaлась -> выходим
@@ -111,6 +110,7 @@ namespace Checkers
         //хранит нажатые клавишы
         HashSet<Keys> pressed;
         //обработчик для движения шашкой
+        bool FLAG;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (!IsBeginGame)
@@ -138,6 +138,7 @@ namespace Checkers
                                         key2 = k;
                                 }
                                 service.MakeMove(key1, key2);
+                                FLAG = true;
                             }
                         }
                         e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
@@ -165,6 +166,7 @@ namespace Checkers
                                         key2 = k;
                                 }
                                 service.MakeMove(key1, key2);
+                                FLAG = true;
                             }
                         }
                         e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
@@ -192,6 +194,7 @@ namespace Checkers
                                         key2 = k;
                                 }
                                 service.MakeMove(key1, key2);
+                                FLAG = true;
                             }
                         }
                         e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
@@ -219,6 +222,7 @@ namespace Checkers
                                         key2 = k;
                                 }
                                 service.MakeMove(key1, key2);
+                                FLAG = true;
                             }
                         }
                         e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
@@ -265,10 +269,11 @@ namespace Checkers
                 ; break;
 
             }
-            if (pressed.Count() == 0)
+            if (pressed.Count() == 0&& FLAG)
             {
                 service.ResetPossibleStep();
                 service.CurrentStep *= -1;
+                FLAG = false;
             }
             //отдаем на отрисовку
             pictureBox_place.Invalidate();

@@ -110,6 +110,10 @@ namespace Checkers
             float heightCell = (float)heightPlace / 8;
 
             //заливка поля
+            using (Pen penForWhiteKing = new Pen(Color.FromArgb(255, 168, 163, 153), 2.0f))
+            using (Brush brushForWhiteKing = new SolidBrush(Color.FromArgb(255, 248, 243, 43)))
+            using (Pen penForBlackKing = new Pen(Color.FromArgb(255, 77, 77, 77), 2.0f))
+            using (Brush brushForBlackKing = new SolidBrush(Color.FromArgb(255, 193, 135, 107)))
             using (Pen penForPossibleStep = new Pen(Color.FromArgb(255, 102, 255, 0), 2.0f))
             using (Brush brushForPossibleStep = new SolidBrush(Color.FromArgb(255, 102, 255, 0)))
             using (Pen penForWhiteCheckers = new Pen(Color.FromArgb(255, 168, 163, 153), 2.0f))
@@ -135,6 +139,14 @@ namespace Checkers
                         else if (game_place[i, j] == 2 || game_place[i, j] == -2)
                         {
                             DrawingCheker(g, brushForPossibleStep, penForPossibleStep, x, y, widthCell);
+                        }
+                        else if (game_place[i, j] == 100)
+                        {
+                            DrawingCheker(g, brushForWhiteKing,penForWhiteKing, x, y, widthCell);
+                        }
+                        else if (game_place[i, j] == -100)
+                        {
+                            DrawingCheker(g, brushForBlackKing, penForBlackKing, x, y, widthCell);
                         }
                     }
                 }
