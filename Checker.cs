@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -109,65 +110,53 @@ namespace Checkers
             // то тогда только устанавливаем варианты тихих ходов
             if (Check_Kill(checker, in current_step))
             {
-                ////устанавливаем варианты для рубки
-                ////потомок-предок
-                //Queue<KeyValuePair<Node,Node>> queue = new Queue<KeyValuePair<Node, Node>>();
-                //queue.Enqueue(new KeyValuePair<Node, Node>(checker,null));
-                //do
-                //{
-                //    var pair = queue.Dequeue();
-                //    Node node = pair.Key;
-                //    //обходим соседей
-                //    foreach (var neighbor in node.neighbors)
-                //    {
-                //        if(neighbor==pair.Value|| neighbor.Value == current_step)
-                //            continue;
-                //        else if (neighbor.Value == 0 && Node.IsSameDiagonal(checker, neighbor))
-                //        {
-                //            queue.Enqueue(new KeyValuePair<Node, Node>(neighbor,node));
-                //        }
-                //        else if (neighbor.Value == -1 * current_step && Node.IsSameDiagonal(checker, neighbor))
-                //        {
-                //            //перебираем соседей соперника
-                //            foreach (var neighbor_opponent in neighbor.neighbors)
-                //            {
-                //                if (neighbor_opponent == node)
-                //                    continue;
-                //                if (neighbor_opponent.Value == 0 && Node.IsSameDiagonal(checker, neighbor_opponent))
-                //                {
-                //                    //устанавливаю временное значение
-                //                    neighbor_opponent.Value = current_step == -1 ? -2 : 2;
-
-                //                }
-                //            }
-                //        }
-                //    }
-
-                //} while (queue.Count() > 0 && checker.IsKing);
-
-                ////нужно затем еще один обход, для того, что если шашка=дамке,
-                ////то дамка после рубки необязательно должна встать сразу за съеденной, а где хочет на диагонали
-                //if (checker.IsKing)
-                //{
-                //    //нужно обозначить ходы по все диагонали как доступными
-                //    queue.Clear();
-                //    queue.Enqueue(new KeyValuePair<Node, Node>(checker, null));
-                //    do
-                //    {
-                //        var pair = queue.Dequeue();
-                //        Node node = pair.Key;
-                //        //обходим соседей
-                //        foreach (var neighbor in node.neighbors)
-                //        {
-                //            if()
-                //        }
-
-                //    } while (queue.Count() > 0 && checker.IsKing);
-                //}
-                if (!checker.IsKing)
+                Stack<Node> stack = new Stack<Node>();
+                HashSet<Node> visited = new HashSet<Node>();    
+                stack.Push(checker);
+                List<Node> newPositionChecker = new List<Node>();
+                newPositionChecker.Add(checker);
+                while (stack.Count > 0)
                 {
-                    SetStepForKill(checker, in current_step);
+                    Node node = stack.Peek();
+                    if(!visited.Contains(node))
+                        visited.Add(node);
+                    if (node.Value == 0)
+                        node.Value = 3;//промежуточное значение
+                    //обход соседей
+                    bool flag = false;
+                    foreach (var neighbor in node.neighbors)
+                    {
+                        if (Node.IsSameDiagonal(neighbor, newPositionChecker[newPositionChecker.Count() - 1]) && node.Value == 0&& !visited.Contains(neighbor)&& newPositionChecker[newPositionChecker.Count() - 1].IsKing)
+                        {
+                            stack.Push(neighbor);
+                            flag = true;
+                            break;
+                        }
+                        else if (Node.IsSameDiagonal(neighbor, newPositionChecker[newPositionChecker.Count() - 1]) && node.Value == -1 * current_step && !visited.Contains(neighbor))
+                        {
+                            visited.Add(neighbor);
+                            //перебираем соседей соперника - ищем пустую клетку, в которую можно встать после рубки
+                            foreach (var neighbor_opponent in neighbor.neighbors)
+                            {
+                                //если сосед соперника пустая клетка и на той же диагонали, что наша шашка -> можно рубить
+                                if (neighbor_opponent.Value == 0 && Node.IsSameDiagonal(newPositionChecker[newPositionChecker.Count()-1], neighbor_opponent))
+                                {
+                                    stack.Push(neighbor_opponent);
+                                    newPositionChecker.Add(neighbor_opponent);
+                                    break;
+                                }
+                            }
+                            flag = true;
+                        }
+                    }
+                    if (!flag)
+                    {
+                        if (!newPositionChecker.Contains(node))
+                            node.Value = 0;
+                        stack.Pop();
+                    }
                 }
+
             }
             // 2. рубить нечего, устанавливаем значения для тихого хода
             else 

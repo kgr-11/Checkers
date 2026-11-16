@@ -56,6 +56,7 @@ namespace Checkers
                         if ((j + 1) % 2 == 0 && (i + 1) % 2 != 0 || (j + 1) % 2 != 0 && (i + 1) % 2 == 0)
                         {
                             game_place[i, j] = new Node(-1, game_place[i, j].Number);
+                            game_place[i, j].IsKing = true;
                             countBlack++;
                         }
                     }
