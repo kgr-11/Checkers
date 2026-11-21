@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cross_Zero
+namespace Checkers.GA
 {
     public static class Genetic_Algorithm
     {
