@@ -9,31 +9,29 @@ namespace Checkers
 {
     public class Service
     {
-        //игровое поле
+        //возможные значения на доске
         // -2 черная дамка
         //-1 - черная шашка
         //0 свободная ячейка
         //1 - белая шашка
         // 2 белая дамка
         // 100 возможный ход текущего шашки
-        Node[,] game_place;
-        int current_step;
-        int countWhite;
-        int countBlack;
+
+        Node[,] game_place;//игровое поле
+        public CurrentStep current_step; //чей текущий ход
+        int countWhite;  // текущее кол-во белых шашек
+        int countBlack;  // текущее кол-во черных шашек
         public int CountWhite
             { get { return countWhite; } }
         public int CountBlack
         { get { return countBlack; } }
-        public int CurrentStep
-        {
-            set { current_step = value; }
-            get { return current_step; }
-        }
         public Service()
         {
             game_place = new Node[8, 8];
             ResetGamePlace();
         }
+
+        //функция сброса игрового поля в исходное состояние
         public void ResetGamePlace()
         {
             int countBlack = 0;
@@ -57,7 +55,6 @@ namespace Checkers
                         if ((j + 1) % 2 == 0 && (i + 1) % 2 != 0 || (j + 1) % 2 != 0 && (i + 1) % 2 == 0)
                         {
                             game_place[i, j] = new Node(-1, game_place[i, j].Number);
-                            game_place[i, j].IsKing = true;
                             countBlack++;
                         }
                     }
@@ -109,10 +106,24 @@ namespace Checkers
                     }  
                 }
             }
+
+            //game_place[5, 2].Value = 2;
+            /*game_place[4,3].Value = -1;
+            game_place[4, 5].Value = -1;
+            game_place[5, 6].Value = 0;
+            game_place[7, 4].Value = 0;
+            game_place[6, 5].Value = -1;
+            game_place[6, 7].Value = 0;
+            game_place[5, 2].Value = 0;
+            game_place[6, 1].Value = 2;
+            game_place[4, 1].Value = -1;
+            game_place[6, 3].Value = -1;
+            game_place[7, 0].Value = 2;*/
             this.countWhite = countWhite;
             this.countBlack= countBlack;
         }
 
+        // функция посредник между классом Form1 и классом рисования
         public void DrawingGamePlace(Graphics g, int widthPlace, int heightPlace)
         {
             //отрисовываем игровое поле
@@ -123,26 +134,28 @@ namespace Checkers
                 for (int j = 0; j < 8; j++)
                 { 
                     place[i, j] = game_place[i, j].Value;
-                    if (game_place[i, j].IsKing)
-                        place[i, j] *= 100;
                 }
             }
             //отрисовываем шашки
             DrawingRepository.DrawingChekers(g, place, widthPlace, heightPlace);
         }
 
+        // функция посредник между классом Form1 и классом рисования -
+        // нужна для отрисовки чей сейчас ход в маленьком PictureBox
         public void DrawingCurrentStep(Graphics g, int widthPlace, int heightPlace)
         {
-            if (current_step == 1)
+            if (current_step == CurrentStep.White)
             {
                 DrawingRepository.DrawingCurrentStep(g, widthPlace, true);
             }
-            else if (current_step == -1)
+            else if (current_step == CurrentStep.Black)
             {
                 DrawingRepository.DrawingCurrentStep(g, widthPlace, false);
             }
         }
 
+
+        //функция определяет в какой клетке курсор
         private void CoordCursorInNumberCell(Point cursor, int sizePlace, out int i,out int j)
         {
             //размеры клетки
@@ -160,8 +173,11 @@ namespace Checkers
                 return false;
 
             //проверка 2 - эта шашка цвета текущего хода?
-            if (game_place[i_index, j_index].Value != current_step)
+            if (current_step == CurrentStep.White&&(game_place[i_index, j_index].Value != 1 && game_place[i_index, j_index].Value != 2)
+                || current_step == CurrentStep.Black && (game_place[i_index, j_index].Value != -1 && game_place[i_index, j_index].Value != -2)) 
+            {
                 return false;
+            }
 
             //проверка 3 -  на возможность сходить выбранной шашкой - без разницы дамка или просто шашка, функция обобщена
             return Checker.IsPossibleMakeMoveChecker(game_place[i_index, j_index], game_place, current_step);
@@ -175,7 +191,7 @@ namespace Checkers
             Checker.SetPossibleStep(game_place[i,j], game_place, in current_step);
         }
 
-        Node choiceNode;
+       /* Node choiceNode;
         //принимает сразу допустимые комбинации клавиш
         public void MakeMove(Keys key1, Keys key2)
         {
@@ -268,7 +284,7 @@ namespace Checkers
                 {
                     if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
                     {
-                        if (current_step == -1)
+                        if (current_step == CurrentStep.Black)
                         {
                             game_place[i, j].Value = -1;
                             choiceNode.Value = 0;
@@ -303,7 +319,7 @@ namespace Checkers
                 {
                     if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
                     {
-                        if (current_step == -1)
+                        if (current_step == CurrentStep.Black)
                         {
                             game_place[i, j].Value = -1;
                             choiceNode.Value = 0;
@@ -337,7 +353,7 @@ namespace Checkers
                 {
                     if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
                     {
-                        if (current_step == -1)
+                        if (current_step == CurrentStep.Black)
                         {
                             game_place[i, j].Value = -1;
                             choiceNode.Value = 0;
@@ -365,15 +381,16 @@ namespace Checkers
                     i++; j++;
                 }
             }
-        }
+        }*/
 
+        //функция сброса возможного хода
         public void ResetPossibleStep()
         {
             for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
             {
                 for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
                 {
-                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
+                    if (game_place[i, j].Value == 100)
                         game_place[i, j].Value = 0;
                 }
             }

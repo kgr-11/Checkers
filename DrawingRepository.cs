@@ -136,15 +136,15 @@ namespace Checkers
                         {
                             DrawingCheker(g, brushForWhiteChekers, penForWhiteCheckers, x, y, widthCell);
                         }
-                        else if (game_place[i, j] == 2 || game_place[i, j] == -2)
+                        else if (game_place[i, j] == 100)
                         {
                             DrawingCheker(g, brushForPossibleStep, penForPossibleStep, x, y, widthCell);
                         }
-                        else if (game_place[i, j] == 100)
+                        else if (game_place[i, j] == 2)
                         {
                             DrawingCheker(g, brushForWhiteKing,penForWhiteKing, x, y, widthCell);
                         }
-                        else if (game_place[i, j] == -100)
+                        else if (game_place[i, j] == -2)
                         {
                             DrawingCheker(g, brushForBlackKing, penForBlackKing, x, y, widthCell);
                         }

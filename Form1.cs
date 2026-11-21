@@ -49,7 +49,7 @@ namespace Checkers
                 }
             }*/
             service.ResetGamePlace();
-            service.CurrentStep = 1;
+            service.current_step = CurrentStep.White;
             textBox_countBlack.Text = service.CountBlack.ToString();
             textBox_countWhite.Text = service.CountWhite.ToString();
             pictureBox_place.Invalidate();
@@ -66,7 +66,7 @@ namespace Checkers
         private void button_reset_Click(object sender, EventArgs e)
         {
             service.ResetGamePlace();
-            service.CurrentStep = 0;
+            service.current_step= CurrentStep.None;
             textBox_countBlack.Text = "";
             textBox_countWhite.Text = "";
             pictureBox_place.Invalidate();
@@ -113,7 +113,7 @@ namespace Checkers
         bool FLAG;
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!IsBeginGame)
+            /*if (!IsBeginGame)
                 return;
             switch (e.KeyCode)
             {
@@ -234,12 +234,12 @@ namespace Checkers
             pictureBox_current_step.Invalidate();
             //из-за фокуса на пискчер боксе клавиши перестают регировать
             this.ActiveControl = null;//снять фокус с контролла
-            this.Focus();//возвращаем фокус форме
+            this.Focus();//возвращаем фокус форме*/
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
-            if (!IsBeginGame)
+            /*if (!IsBeginGame)
                 return;
             switch (e.KeyCode)
             {
@@ -280,7 +280,7 @@ namespace Checkers
             pictureBox_current_step.Invalidate();
             //из-за фокуса на пискчер боксе клавиши перестают регировать
             this.ActiveControl = null;//снять фокус с контролла
-            this.Focus();//возвращаем фокус форме
+            this.Focus();//возвращаем фокус форме*/
         }
 
     }

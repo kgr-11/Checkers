@@ -15,6 +15,14 @@ namespace Checkers
         public int Value { get; set; }
         //номер узла
         public int Number { get; init; }
+        public bool IsKing 
+        {
+            get {
+                if (Value == 2 || Value == -2)
+                    return true;
+                return false;
+            }
+        }
         public Node(int value, int number)
         {
             Value = value;
