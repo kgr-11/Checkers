@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Checkers
 {
@@ -34,6 +35,7 @@ namespace Checkers
         //функция сброса игрового поля в исходное состояние
         public void ResetGamePlace()
         {
+            current_step = CurrentStep.White;
             int countBlack = 0;
             int countWhite = 0;
             int count = 1;
@@ -107,7 +109,72 @@ namespace Checkers
                 }
             }
 
-            //game_place[5, 2].Value = 2;
+            //game_place[0, 0].Value = 0;
+            //game_place[0, 1].Value = 0;
+            //game_place[0, 2].Value = 0;
+            //game_place[0, 3].Value = 0;
+            //game_place[0, 4].Value = 0;
+            //game_place[0, 5].Value = 0;
+            //game_place[0, 6].Value = 0;
+            //game_place[0, 7].Value = 0;
+            //game_place[1, 0].Value = 0;
+            //game_place[1, 1].Value = 0;
+            //game_place[1, 2].Value = 0;
+            //game_place[1, 3].Value = 0;
+            //game_place[1, 4].Value = 0;
+            //game_place[1, 5].Value = 0;
+            //game_place[1, 6].Value = 0;
+            //game_place[1, 7].Value = 0;
+            //game_place[2, 0].Value = 0;
+            //game_place[2, 1].Value = 0;
+            //game_place[2, 2].Value = 0;
+            //game_place[2, 3].Value = 0;
+            //game_place[2, 4].Value = 0;
+            //game_place[2, 5].Value = 0;
+            //game_place[2, 6].Value = 0;
+            //game_place[2, 7].Value = 0;
+            //game_place[3, 0].Value = 0;
+            //game_place[3, 1].Value = 0;
+            //game_place[3, 2].Value = 0;
+            //game_place[3, 3].Value = 0;
+            //game_place[3, 4].Value = 0;
+            //game_place[3, 5].Value = 0;
+            //game_place[3, 6].Value = 0;
+            //game_place[3, 7].Value = 0;
+            //game_place[4, 0].Value = 0;
+            //game_place[4, 1].Value = 0;
+            //game_place[4, 2].Value = 0;
+            //game_place[4, 3].Value = 0;
+            //game_place[4, 4].Value = 0;
+            //game_place[4, 5].Value = 0;
+            //game_place[4, 6].Value = 0;
+            //game_place[4, 7].Value = 0;
+            //game_place[5, 0].Value = 0;
+            //game_place[5, 1].Value = 0;
+            //game_place[5, 2].Value = 0;
+            //game_place[5, 3].Value = 0;
+            //game_place[5, 4].Value = 0;
+            //game_place[5, 5].Value = 0;
+            //game_place[5, 6].Value = 0;
+            //game_place[5, 7].Value = 0;
+            //game_place[6, 0].Value = 0;
+            //game_place[6, 1].Value = 0;
+            //game_place[6, 2].Value = 0;
+            //game_place[6, 3].Value = 0;
+            //game_place[6, 4].Value = 0;
+            //game_place[6, 5].Value = 0;
+            //game_place[6, 6].Value = 0;
+            //game_place[6, 7].Value = 0;
+            //game_place[7, 0].Value = 0;
+            //game_place[7, 1].Value = 0;
+            //game_place[7, 2].Value = 0;
+            //game_place[7, 3].Value = 0;
+            //game_place[7, 4].Value = 0;
+            //game_place[7, 5].Value = 0;
+            //game_place[7, 6].Value = 0;
+            //game_place[7, 7].Value = 0;
+            //game_place[3, 4].Value = 2;
+            //game_place[1, 0].Value = -2;
             /*game_place[4,3].Value = -1;
             game_place[4, 5].Value = -1;
             game_place[5, 6].Value = 0;
@@ -183,206 +250,66 @@ namespace Checkers
             return Checker.IsPossibleMakeMoveChecker(game_place[i_index, j_index], game_place, current_step);
         }
 
+        List<List<Node>> buffer;
         //прослойка
         public void SetPossibleStep(Point cursor, int sizePlace)
         {
             //определяем индексы клетки в матрице игры
             CoordCursorInNumberCell(cursor, sizePlace, out int i, out int j);
-            Checker.SetPossibleStep(game_place[i,j], game_place, in current_step);
+            //принимаем список путей из текущей клетки
+            buffer = Checker.SetPossibleStep(game_place[i,j], game_place, in current_step);
         }
-
-       /* Node choiceNode;
-        //принимает сразу допустимые комбинации клавиш
-        public void MakeMove(Keys key1, Keys key2)
+        public bool IsMakeMove(Point cursor, int sizePlace)
         {
-            if (choiceNode is null)
+            // определяем индексы клетки в матрице игры
+            CoordCursorInNumberCell(cursor, sizePlace, out int ii, out int jj);
+            int number =ii * 8 + (jj + 1);
+            foreach (var lst in buffer)
             {
-                return;
+                if (lst[lst.Count-1].Number==number)
+                    return true;
             }
-            choiceNode.IndexInMtx(out int i, out int j);
-            //вверх-влево
-            if (key1 == Keys.Up && key2 == Keys.Left ||
-                key1 == Keys.Left && key2 == Keys.Up)
+            return false;
+        }
+        public void MakeMove(Point cursor, int sizePlace)
+        {
+            // определяем индексы клетки в матрице игры
+            CoordCursorInNumberCell(cursor, sizePlace, out int ii, out int jj);
+            int number = ii  * 8 + (jj + 1);
+            int indexPath = -1;
+            //находим нужный путь
+            for(int i=0;i<buffer.Count;i++)
             {
-                while (i >= 0 && j >= 0)
-                {
-                    if (game_place[i,j].Value==2|| game_place[i, j].Value == -2) 
-                    {
-                        if (Math.Abs(choiceNode.Value) == 1)
-                        {
-                            if (current_step == -1)
-                            {
-                                game_place[i, j].Value = -1;
-                                choiceNode.Value = 0;
-                                if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
-                                {
-                                    game_place[i + 1, j + 1].Value = 0;
-                                    choiceNode = game_place[i, j];
-                                    countWhite--;
-                                    if (choiceNode.Number >= 57)
-                                        choiceNode.IsKing = true;
-                                }
-                                else if (game_place[i, j].Number >= 57)
-                                {
-                                    choiceNode.IsKing = true;
-                                }
+                if (buffer[i][buffer[i].Count-1].Number == number)
+                { 
+                    indexPath=i; break;
+                }  
+            }
+            var val=buffer[indexPath][0].Value;
+            //идем по пути
+            for (int i = 1; i < buffer[indexPath].Count-1; i++)
+            {
+                if (buffer[indexPath][i].Value == -1 || buffer[indexPath][i].Value == -2)
+                    countBlack--;
+                else if (buffer[indexPath][i].Value == 1 || buffer[indexPath][i].Value == 2)
+                    countWhite--;
+                //проверка, что шашка может стать дамкой - могли прошмыгнуть ту сторону
+                if (current_step == CurrentStep.White && buffer[indexPath][i].Number < 9)
+                    val = 2;
+                else if(current_step == CurrentStep.Black && buffer[indexPath][i].Number>56)
+                    val = -2;
 
-                            }
-                            else
-                            {
-                                game_place[i, j].Value = 1;
-                                choiceNode.Value = 0;
-                                if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
-                                {
-                                    game_place[i + 1, j + 1].Value = 0;
-                                    choiceNode = game_place[i, j];
-                                    countBlack--;
-                                    if (choiceNode.Number <=8)
-                                        choiceNode.IsKing = true;
-                                }
-                                else if (game_place[i, j].Number <=8)
-                                {
-                                    choiceNode.IsKing = true;
-                                }
-                            }
-                        }
-                        else//иначе это дамка
-                        {
-                            if (current_step == -1)
-                            {
-                                choiceNode.IsKing = true;
-                                choiceNode.Value = 0;
-                                if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
-                                {
-                                    game_place[i + 1, j + 1].Value = 0;
-                                    choiceNode = game_place[i, j];
-                                    countWhite--;
-                                }
-                            }
-                            else
-                            {
-                                choiceNode.IsKing = true;
-                                choiceNode.Value = 0;
-                                if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
-                                {
-                                    game_place[i + 1, j + 1].Value = 0;
-                                    choiceNode = game_place[i, j];
-                                    countBlack--;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    i--;j--;
-                }
+                buffer[indexPath][i].Value = 0;
             }
-            //вверх-вправо
-            else if (key1 == Keys.Up && key2 == Keys.Right ||
-                key1 == Keys.Right && key2 == Keys.Up)
-            {
-                while (i >= 0 && j<=game_place.GetUpperBound(1))
-                {
-                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
-                    {
-                        if (current_step == CurrentStep.Black)
-                        {
-                            game_place[i, j].Value = -1;
-                            choiceNode.Value = 0;
-                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
-                            {
-                                game_place[i + 1, j - 1].Value = 0;
-                                choiceNode = game_place[i, j];
-                                countWhite--;
-                            }
-                        }
-                        else
-                        {
-                            game_place[i, j].Value = 1;
-                            choiceNode.Value = 0;
-                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
-                            {
-                                game_place[i + 1, j - 1].Value = 0;
-                                choiceNode = game_place[i, j];
-                                countBlack--;
-                            }
-                        }
-                        break;
-                    }
-                    i--; j++;
-                }
+            buffer[indexPath][0].Value = 0;
+            //если четко встали на противоположную сторону
+            if ((current_step == CurrentStep.Black && buffer[indexPath][buffer[indexPath].Count - 1].Number > 56)
+                || (current_step == CurrentStep.White && buffer[indexPath][buffer[indexPath].Count - 1].Number <9) )
+            { 
+                val=current_step==CurrentStep.White ? 2 : -2;
             }
-            //вниз-влево
-            else if (key1 == Keys.Down && key2 == Keys.Left ||
-                key1 == Keys.Left && key2 == Keys.Down)
-            {
-                while (i<=game_place.GetUpperBound(0) && j >= 0)
-                {
-                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
-                    {
-                        if (current_step == CurrentStep.Black)
-                        {
-                            game_place[i, j].Value = -1;
-                            choiceNode.Value = 0;
-                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
-                            {
-                                game_place[i - 1, j + 1].Value = 0;
-                                choiceNode = game_place[i, j];
-                                countWhite--;
-                            }
-                        }
-                        else
-                        {
-                            game_place[i, j].Value = 1;
-                            choiceNode.Value = 0;
-                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 7)
-                            {
-                                game_place[i - 1, j + 1].Value = 0;
-                                choiceNode = game_place[i, j];
-                                countBlack--;
-                            }
-                        }
-                        break;
-                    }
-                    i++; j--;
-                }
-            }
-            //вниз-вправо
-            else
-            {
-                while (i <=game_place.GetUpperBound(0) && j <=game_place.GetUpperBound(1))
-                {
-                    if (game_place[i, j].Value == 2 || game_place[i, j].Value == -2)
-                    {
-                        if (current_step == CurrentStep.Black)
-                        {
-                            game_place[i, j].Value = -1;
-                            choiceNode.Value = 0;
-                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
-                            {
-                                game_place[i - 1, j - 1].Value = 0;
-                                choiceNode = game_place[i, j];
-                                countWhite--;
-                            }
-                        }
-                        else
-                        {
-                            game_place[i, j].Value = 1;
-                            choiceNode.Value = 0;
-                            if (Math.Abs(game_place[i, j].Number - choiceNode.Number) > 9)
-                            {
-                                game_place[i - 1, j - 1].Value = 0;
-                                choiceNode = game_place[i, j];
-                                countBlack--;
-
-                            }
-                        }
-                        break;
-                    }
-                    i++; j++;
-                }
-            }
-        }*/
-
+            buffer[indexPath][buffer[indexPath].Count - 1].Value = val;
+        }
         //функция сброса возможного хода
         public void ResetPossibleStep()
         {
@@ -394,6 +321,10 @@ namespace Checkers
                         game_place[i, j].Value = 0;
                 }
             }
+        }
+        public void ChangePace()
+        { 
+            current_step=current_step==CurrentStep.White?CurrentStep.Black:CurrentStep.White;
         }
     }
 }

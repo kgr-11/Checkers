@@ -158,7 +158,7 @@ namespace Checkers
         //функция установки допустимых ходов для выбранной шашки
         //функция срабатывает после всех проверок
         //устанавливает временные значения как возможные ходы, если эта функция вызвалась, значит они точно есть
-        public static void SetPossibleStep(Node checker, Node[,] game_place, in CurrentStep current_step)
+        public static List<List<Node>> SetPossibleStep(Node checker, Node[,] game_place, in CurrentStep current_step)
         {
             // 1. устанавливаем сначала ходы для сруба(ограничение такое,
             // что ставим дамку пока что сразу за последней срубленной),
@@ -166,7 +166,6 @@ namespace Checkers
             // то тогда только устанавливаем варианты тихих ходов
             if (Check_Kill(checker, in current_step))
             {
-
                 //очередь для обхода в ширину
                 Queue<Node> queue = new Queue<Node>();
                 queue.Enqueue(checker);
@@ -174,6 +173,7 @@ namespace Checkers
                 HashSet<Node> visited = new HashSet<Node>();
                 if (checker.IsKing)
                 {
+                    List<List<Node>> list_step = new List<List<Node>>();
                     //изначально запоминаем все дамки, чтобы потом не удалить
                     HashSet<Node> Kings = new HashSet<Node>();
                     for (int i = 0; i < game_place.GetLength(0); i++)
@@ -298,9 +298,12 @@ namespace Checkers
                             }
                         }
                     }
+                    return list_step;
+
                 }
                 else
                 {
+                    List<List<Node>> list_step = new List<List<Node>>();
                     //словарь предков
                     Dictionary<Node, Node> parents = new Dictionary<Node, Node>();
                     //key-потомок
@@ -349,6 +352,28 @@ namespace Checkers
                             pair1.Key.Value = 100;//конечный возможный ход
                         }
                     }
+                    //нужно восстановить список возможных ходов от начала и до конца
+                    foreach (var pair1 in parents)
+                    {
+                        if (pair1.Key.Value == 100)
+                        {
+                            //восстанавливаем путь с конца
+                            list_step.Add(new List<Node> { pair1.Key });
+                            var parent = pair1.Key;
+                            while (true)
+                            {
+                                parent = parents[parent];
+                                if (parent == checker)
+                                    break;
+                                list_step[list_step.Count - 1].Insert(0, parent);
+                            }
+                        }
+                    }
+                    for (int i = 0; i < list_step.Count; i++)
+                    {
+                        list_step[i].Insert(0, checker);
+                    }
+                    return list_step;
                 }
 
             }
@@ -357,6 +382,7 @@ namespace Checkers
             // для дамки пока не упрется куда-нибудь
             else
             {
+                List<List<Node>>list_step = new List<List<Node>>();
                 Queue<Node> queue = new Queue<Node>();
                 HashSet<Node> visited = new HashSet<Node>();
                 queue.Enqueue(checker);
@@ -372,6 +398,7 @@ namespace Checkers
                         if (neighbor.Value == 0 && checker.IsKing && Node.IsSameDiagonal(checker, neighbor))
                         {
                             neighbor.Value = 100;
+                            list_step.Add(new List<Node> {checker, neighbor });
                             queue.Enqueue(neighbor);
                         }
                         //если соседняя клетка для выбранной ШАШКИ пустая, то проверяем можно ли туда ходить, т.к. ходить нельзя
@@ -385,11 +412,13 @@ namespace Checkers
                                 || current_step == CurrentStep.Black && neighbor.Number > checker.Number)
                             {
                                 neighbor.Value = 100;
+                                list_step.Add(new List<Node> {checker, neighbor });
                             }
                         }
                     }
 
                 } while (queue.Count() > 0 && checker.IsKing);
+                return list_step;
             }
         }
 

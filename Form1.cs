@@ -12,7 +12,6 @@ namespace Checkers
             service = new Service();
             button_reset.Enabled = false;
             IsBeginGame = false;
-            pressed = new HashSet<Keys>();//хранит зажатые клавиши
             //обработчики клавиш для движения шашек
             this.KeyPreview = true;//чтобы контроллы не перехватили управление
         }
@@ -49,7 +48,6 @@ namespace Checkers
                 }
             }*/
             service.ResetGamePlace();
-            service.current_step = CurrentStep.White;
             textBox_countBlack.Text = service.CountBlack.ToString();
             textBox_countWhite.Text = service.CountWhite.ToString();
             pictureBox_place.Invalidate();
@@ -81,206 +79,43 @@ namespace Checkers
             this.Focus();//возвращаем фокус форме
         }
 
+        Point? buffer;
         private void pictureBox_place_MouseClick(object sender, MouseEventArgs e)
         {
             //проверка начала игры, если игра не начaлась -> выходим
             if (!IsBeginGame)
                 return;
-            //сброс возможного хода, если до этого что-то выбрано было
-            service.ResetPossibleStep();
-            //проверка выбранного хода, можно ли ходить этой шашкой
-            if (!service.CheckPossibleStep(e.Location, pictureBox_place.Width))
+            if (buffer == null||!service.IsMakeMove(e.Location, pictureBox_place.Width))
             {
-                pictureBox_place.Invalidate();
-                return;
+                //сброс возможного хода, если до этого что-то выбрано было
+                service.ResetPossibleStep();
+                //проверка выбранного хода, можно ли ходить этой шашкой
+                if (!service.CheckPossibleStep(e.Location, pictureBox_place.Width))
+                {
+                    pictureBox_place.Invalidate();
+                    return;
+                }
+
+                //заполняем матрицу нужными ходами(меняем значения на временные)
+                service.SetPossibleStep(e.Location, pictureBox_place.Width);
+                buffer = e.Location;//запомнили прошлое нажатие
             }
-
-            //заполняем матрицу нужными ходами(меняем значения на временные)
-            service.SetPossibleStep(e.Location, pictureBox_place.Width);
-
+            else
+            {
+                //делаем ход
+                service.MakeMove(e.Location, pictureBox_place.Width);
+                //сброс ходов
+                service.ResetPossibleStep();
+                //смена хода
+                service.ChangePace();
+                buffer = null;    
+            }
             //отдаем на отрисовку
             pictureBox_place.Invalidate();
+            pictureBox_current_step.Invalidate();
             //из-за фокуса на пискчер боксе клавиши перестают регировать
             this.ActiveControl = null;//снять фокус с контролла
             this.Focus();//возвращаем фокус форме
-        }
-
-
-
-        //хранит нажатые клавишы
-        HashSet<Keys> pressed;
-        //обработчик для движения шашкой
-        bool FLAG;
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-            /*if (!IsBeginGame)
-                return;
-            switch (e.KeyCode)
-            {
-                case Keys.Left:
-                    {
-                        if (pressed.Count() >= 0 && pressed.Count() < 2)
-                        {
-                            pressed.Add(Keys.Left);
-                            if (pressed.Count() == 2)
-                            {
-                                Keys key1=Keys.Up;
-                                Keys key2= Keys.Up;
-                                bool flag = true;
-                                foreach (var k in pressed)
-                                {
-                                    if (flag)
-                                    {
-                                        key1 = k;
-                                        flag = false;
-                                    }
-                                    else
-                                        key2 = k;
-                                }
-                                service.MakeMove(key1, key2);
-                                FLAG = true;
-                            }
-                        }
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-                case Keys.Right:
-                    {
-                        if (pressed.Count() >= 0 && pressed.Count() < 2)
-                        {
-                            pressed.Add(Keys.Right);
-                            if (pressed.Count() == 2)
-                            {
-                                //пробуем сделать ход
-                                Keys key1 = Keys.Up;
-                                Keys key2 = Keys.Up;
-                                bool flag = true;
-                                foreach (var k in pressed)
-                                {
-                                    if (flag)
-                                    {
-                                        key1 = k;
-                                        flag = false;
-                                    }
-                                    else
-                                        key2 = k;
-                                }
-                                service.MakeMove(key1, key2);
-                                FLAG = true;
-                            }
-                        }
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-                case Keys.Up:
-                    {
-                        if (pressed.Count() >= 0 && pressed.Count() < 2)
-                        {
-                            pressed.Add(Keys.Up);
-                            if (pressed.Count() == 2)
-                            {
-                                //пробуем сделать ход
-                                Keys key1 = Keys.Up;
-                                Keys key2 = Keys.Up;
-                                bool flag = true;
-                                foreach (var k in pressed)
-                                {
-                                    if (flag)
-                                    {
-                                        key1 = k;
-                                        flag = false;
-                                    }
-                                    else
-                                        key2 = k;
-                                }
-                                service.MakeMove(key1, key2);
-                                FLAG = true;
-                            }
-                        }
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-                case Keys.Down:
-                    {
-                        if (pressed.Count() >= 0 && pressed.Count() < 2)
-                        {
-                            pressed.Add(Keys.Down);
-                            if (pressed.Count() == 2)
-                            {
-                                //пробуем сделать ход
-                                Keys key1 = Keys.Up;
-                                Keys key2 = Keys.Up;
-                                bool flag = true;
-                                foreach (var k in pressed)
-                                {
-                                    if (flag)
-                                    {
-                                        key1 = k;
-                                        flag = false;
-                                    }
-                                    else
-                                        key2 = k;
-                                }
-                                service.MakeMove(key1, key2);
-                                FLAG = true;
-                            }
-                        }
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-            }
-            //отдаем на отрисовку
-            pictureBox_place.Invalidate();
-            pictureBox_current_step.Invalidate();
-            //из-за фокуса на пискчер боксе клавиши перестают регировать
-            this.ActiveControl = null;//снять фокус с контролла
-            this.Focus();//возвращаем фокус форме*/
-        }
-
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
-        {
-            /*if (!IsBeginGame)
-                return;
-            switch (e.KeyCode)
-            {
-                case Keys.Left:
-                    {
-                        pressed.Remove(Keys.Left);
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-                case Keys.Right:
-                    {
-                        pressed.Remove(Keys.Right);
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-                case Keys.Up:
-                    {
-                        pressed.Remove(Keys.Up);
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-                case Keys.Down:
-                    {
-                        pressed.Remove(Keys.Down);
-                        e.Handled = true;//чтобы до контролла, который в фокусе ничего не дошло
-                    }
-                ; break;
-
-            }
-            if (pressed.Count() == 0&& FLAG)
-            {
-                service.ResetPossibleStep();
-                service.CurrentStep *= -1;
-                FLAG = false;
-            }
-            //отдаем на отрисовку
-            pictureBox_place.Invalidate();
-            pictureBox_current_step.Invalidate();
-            //из-за фокуса на пискчер боксе клавиши перестают регировать
-            this.ActiveControl = null;//снять фокус с контролла
-            this.Focus();//возвращаем фокус форме*/
         }
 
     }
