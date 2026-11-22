@@ -109,22 +109,22 @@ namespace Checkers
                 }
             }
 
-            //game_place[0, 0].Value = 0;
-            //game_place[0, 1].Value = 0;
-            //game_place[0, 2].Value = 0;
-            //game_place[0, 3].Value = 0;
-            //game_place[0, 4].Value = 0;
-            //game_place[0, 5].Value = 0;
-            //game_place[0, 6].Value = 0;
-            //game_place[0, 7].Value = 0;
-            //game_place[1, 0].Value = 0;
-            //game_place[1, 1].Value = 0;
-            //game_place[1, 2].Value = 0;
-            //game_place[1, 3].Value = 0;
-            //game_place[1, 4].Value = 0;
-            //game_place[1, 5].Value = 0;
-            //game_place[1, 6].Value = 0;
-            //game_place[1, 7].Value = 0;
+            game_place[0, 0].Value = 0;
+            game_place[0, 1].Value = 0;
+            game_place[0, 2].Value = 0;
+            game_place[0, 3].Value = 0;
+            game_place[0, 4].Value = 0;
+            game_place[0, 5].Value = 0;
+            game_place[0, 6].Value = 0;
+            game_place[0, 7].Value = 0;
+            game_place[1, 0].Value = 0;
+            game_place[1, 1].Value = 0;
+            game_place[1, 2].Value = 0;
+            game_place[1, 3].Value = 0;
+            game_place[1, 4].Value = 0;
+            game_place[1, 5].Value = 0;
+            game_place[1, 6].Value = 0;
+            game_place[1, 7].Value = 0;
             //game_place[2, 0].Value = 0;
             //game_place[2, 1].Value = 0;
             //game_place[2, 2].Value = 0;
@@ -157,22 +157,22 @@ namespace Checkers
             //game_place[5, 5].Value = 0;
             //game_place[5, 6].Value = 0;
             //game_place[5, 7].Value = 0;
-            //game_place[6, 0].Value = 0;
-            //game_place[6, 1].Value = 0;
-            //game_place[6, 2].Value = 0;
-            //game_place[6, 3].Value = 0;
-            //game_place[6, 4].Value = 0;
-            //game_place[6, 5].Value = 0;
-            //game_place[6, 6].Value = 0;
-            //game_place[6, 7].Value = 0;
-            //game_place[7, 0].Value = 0;
-            //game_place[7, 1].Value = 0;
-            //game_place[7, 2].Value = 0;
-            //game_place[7, 3].Value = 0;
-            //game_place[7, 4].Value = 0;
-            //game_place[7, 5].Value = 0;
-            //game_place[7, 6].Value = 0;
-            //game_place[7, 7].Value = 0;
+            game_place[6, 0].Value = 0;
+            game_place[6, 1].Value = 0;
+            game_place[6, 2].Value = 0;
+            game_place[6, 3].Value = 0;
+            game_place[6, 4].Value = 0;
+            game_place[6, 5].Value = 0;
+            game_place[6, 6].Value = 0;
+            game_place[6, 7].Value = 0;
+            game_place[7, 0].Value = 0;
+            game_place[7, 1].Value = 0;
+            game_place[7, 2].Value = 0;
+            game_place[7, 3].Value = 0;
+            game_place[7, 4].Value = 0;
+            game_place[7, 5].Value = 0;
+            game_place[7, 6].Value = 0;
+            game_place[7, 7].Value = 0;
             //game_place[3, 4].Value = 2;
             //game_place[1, 0].Value = -2;
             /*game_place[4,3].Value = -1;
@@ -230,6 +230,7 @@ namespace Checkers
             i = (int)(cursor.Y / sizeCell);
             j = (int)(cursor.X / sizeCell);
         }
+        //этот вариант метода вызывается вне класса
         public bool CheckPossibleStep(Point cursor, int sizePlace)
         {
             //определяем индексы клетки в матрице игры
@@ -242,6 +243,23 @@ namespace Checkers
             //проверка 2 - эта шашка цвета текущего хода?
             if (current_step == CurrentStep.White&&(game_place[i_index, j_index].Value != 1 && game_place[i_index, j_index].Value != 2)
                 || current_step == CurrentStep.Black && (game_place[i_index, j_index].Value != -1 && game_place[i_index, j_index].Value != -2)) 
+            {
+                return false;
+            }
+
+            //проверка 3 -  на возможность сходить выбранной шашкой - без разницы дамка или просто шашка, функция обобщена
+            return Checker.IsPossibleMakeMoveChecker(game_place[i_index, j_index], game_place, current_step);
+        }
+        //этот вариант метода вызывается из класса
+        private bool CheckPossibleStep(in int i_index, in int j_index)
+        {
+            //проверка 1 - эта клетка с шашкой?
+            if (game_place[i_index, j_index].Value == 0)
+                return false;
+
+            //проверка 2 - эта шашка цвета текущего хода?
+            if (current_step == CurrentStep.White && (game_place[i_index, j_index].Value != 1 && game_place[i_index, j_index].Value != 2)
+                || current_step == CurrentStep.Black && (game_place[i_index, j_index].Value != -1 && game_place[i_index, j_index].Value != -2))
             {
                 return false;
             }
@@ -325,6 +343,53 @@ namespace Checkers
         public void ChangePace()
         { 
             current_step=current_step==CurrentStep.White?CurrentStep.Black:CurrentStep.White;
+        }
+
+
+        public bool IsHasMovies()
+        {
+            for (int i = 0; i < game_place.GetLength(0); i++)
+            {
+                for (int j = 0; j < game_place.GetLength(1); j++)
+                {
+                    //проверяем ходы для белых
+                    if ((game_place[i, j].Value == 1 || game_place[i, j].Value == 2) && current_step == CurrentStep.White)
+                    {
+                        if (CheckPossibleStep(in i,in j))
+                            return true;
+                    }
+                    //проверяем ходы для черных
+                    else if ((game_place[i, j].Value == -1 || game_place[i, j].Value == -2) && current_step == CurrentStep.Black)
+                    {
+                        if (CheckPossibleStep(in i, in j))
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public List<Node> All_Possible_Move()
+        { 
+            List<Node> steps= new List<Node>();
+            for (int i = 0; i < game_place.GetLength(0); i++)
+            {
+                for (int j = 0; j < game_place.GetLength(1); j++)
+                {
+                    //проверяем ходы для белых
+                    if ((game_place[i, j].Value == 1 || game_place[i, j].Value == 2) && current_step == CurrentStep.White)
+                    {
+                        if (CheckPossibleStep(in i, in j))
+                            steps.Add(game_place[i, j]);
+                    }
+                    //проверяем ходы для черных
+                    else if ((game_place[i, j].Value == -1 || game_place[i, j].Value == -2) && current_step == CurrentStep.Black)
+                    {
+                        if (CheckPossibleStep(in i, in j))
+                            steps.Add(game_place[i, j]);
+                    }
+                }
+            }
+            return steps;
         }
     }
 }

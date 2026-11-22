@@ -12,10 +12,8 @@ namespace Checkers
             service = new Service();
             button_reset.Enabled = false;
             IsBeginGame = false;
-            //обработчики клавиш для движения шашек
-            this.KeyPreview = true;//чтобы контроллы не перехватили управление
         }
-
+        
         private void pictureBox_place_Paint(object sender, PaintEventArgs e)
         {
             textBox_countBlack.Text = service.CountBlack.ToString();
@@ -56,9 +54,6 @@ namespace Checkers
             button_game_start.Enabled = false;
             checkBox_bot.Enabled = false;
             IsBeginGame = true;
-            //из-за этой кнопки, клавиши перестают регировать
-            this.ActiveControl = null;//снять фокус с кнопки
-            this.Focus();//возвращаем фокус форме
         }
 
         private void button_reset_Click(object sender, EventArgs e)
@@ -74,9 +69,6 @@ namespace Checkers
             checkBox_bot.Enabled = true;
             checkBox_bot.Checked = false;
             IsBeginGame = false;
-            //из-за этой кнопки, клавиши перестают регировать
-            this.ActiveControl = null;//снять фокус с кнопки
-            this.Focus();//возвращаем фокус форме
         }
 
         Point? buffer;
@@ -108,14 +100,30 @@ namespace Checkers
                 service.ResetPossibleStep();
                 //смена хода
                 service.ChangePace();
+
+                //проверяем не закончилась ли игра - нет ходов для текущего цвета - игра закончилась, чей сейчас был ход победил
+                if (!service.IsHasMovies())
+                {
+                    string winner = "";
+                    if (service.current_step == CurrentStep.White)
+                        winner = "ЧЁРНЫЕ";
+                    else winner = "БЕЛЫЕ";
+
+                    //отдаем на отрисовку сразу, чтобы сначала был сделан ход, а только потом сообщение вывелось
+                    pictureBox_place.Invalidate();
+                    pictureBox_current_step.Invalidate();
+
+                    Thread.Sleep(300);
+                    MessageBox.Show($"Победили {winner}!", "Игра закончена!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    service.current_step = CurrentStep.None;
+                    IsBeginGame = false;//закончили игру
+                    
+                }
                 buffer = null;    
             }
             //отдаем на отрисовку
             pictureBox_place.Invalidate();
             pictureBox_current_step.Invalidate();
-            //из-за фокуса на пискчер боксе клавиши перестают регировать
-            this.ActiveControl = null;//снять фокус с контролла
-            this.Focus();//возвращаем фокус форме
         }
 
     }
