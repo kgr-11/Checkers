@@ -18,7 +18,7 @@ namespace Checkers
         // 2 белая дамка
         // 100 возможный ход текущего шашки
 
-        Node[,] game_place;//игровое поле
+        public Node[,] game_place;//игровое поле
         public CurrentStep current_step; //чей текущий ход
         int countWhite;  // текущее кол-во белых шашек
         int countBlack;  // текущее кол-во черных шашек
@@ -109,22 +109,22 @@ namespace Checkers
                 }
             }
 
-            game_place[0, 0].Value = 0;
-            game_place[0, 1].Value = 0;
-            game_place[0, 2].Value = 0;
-            game_place[0, 3].Value = 0;
-            game_place[0, 4].Value = 0;
-            game_place[0, 5].Value = 0;
-            game_place[0, 6].Value = 0;
-            game_place[0, 7].Value = 0;
-            game_place[1, 0].Value = 0;
-            game_place[1, 1].Value = 0;
-            game_place[1, 2].Value = 0;
-            game_place[1, 3].Value = 0;
-            game_place[1, 4].Value = 0;
-            game_place[1, 5].Value = 0;
-            game_place[1, 6].Value = 0;
-            game_place[1, 7].Value = 0;
+            //game_place[0, 0].Value = 0;
+            //game_place[0, 1].Value = 0;
+            //game_place[0, 2].Value = 0;
+            //game_place[0, 3].Value = 0;
+            //game_place[0, 4].Value = 0;
+            //game_place[0, 5].Value = 0;
+            //game_place[0, 6].Value = 0;
+            //game_place[0, 7].Value = 0;
+            //game_place[1, 0].Value = 0;
+            //game_place[1, 1].Value = 0;
+            //game_place[1, 2].Value = 0;
+            //game_place[1, 3].Value = 0;
+            //game_place[1, 4].Value = 0;
+            //game_place[1, 5].Value = 0;
+            //game_place[1, 6].Value = 0;
+            //game_place[1, 7].Value = 0;
             //game_place[2, 0].Value = 0;
             //game_place[2, 1].Value = 0;
             //game_place[2, 2].Value = 0;
@@ -157,22 +157,22 @@ namespace Checkers
             //game_place[5, 5].Value = 0;
             //game_place[5, 6].Value = 0;
             //game_place[5, 7].Value = 0;
-            game_place[6, 0].Value = 0;
-            game_place[6, 1].Value = 0;
-            game_place[6, 2].Value = 0;
-            game_place[6, 3].Value = 0;
-            game_place[6, 4].Value = 0;
-            game_place[6, 5].Value = 0;
-            game_place[6, 6].Value = 0;
-            game_place[6, 7].Value = 0;
-            game_place[7, 0].Value = 0;
-            game_place[7, 1].Value = 0;
-            game_place[7, 2].Value = 0;
-            game_place[7, 3].Value = 0;
-            game_place[7, 4].Value = 0;
-            game_place[7, 5].Value = 0;
-            game_place[7, 6].Value = 0;
-            game_place[7, 7].Value = 0;
+            //game_place[6, 0].Value = 0;
+            //game_place[6, 1].Value = 0;
+            //game_place[6, 2].Value = 0;
+            //game_place[6, 3].Value = 0;
+            //game_place[6, 4].Value = 0;
+            //game_place[6, 5].Value = 0;
+            //game_place[6, 6].Value = 0;
+            //game_place[6, 7].Value = 0;
+            //game_place[7, 0].Value = 0;
+            //game_place[7, 1].Value = 0;
+            //game_place[7, 2].Value = 0;
+            //game_place[7, 3].Value = 0;
+            //game_place[7, 4].Value = 0;
+            //game_place[7, 5].Value = 0;
+            //game_place[7, 6].Value = 0;
+            //game_place[7, 7].Value = 0;
             //game_place[3, 4].Value = 2;
             //game_place[1, 0].Value = -2;
             /*game_place[4,3].Value = -1;
@@ -188,6 +188,7 @@ namespace Checkers
             game_place[7, 0].Value = 2;*/
             this.countWhite = countWhite;
             this.countBlack= countBlack;
+            movesWithoutCapture = 0;
         }
 
         // функция посредник между классом Form1 и классом рисования
@@ -277,6 +278,8 @@ namespace Checkers
             //принимаем список путей из текущей клетки
             buffer = Checker.SetPossibleStep(game_place[i,j], game_place, in current_step);
         }
+
+        
         public bool IsMakeMove(Point cursor, int sizePlace)
         {
             // определяем индексы клетки в матрице игры
@@ -289,6 +292,7 @@ namespace Checkers
             }
             return false;
         }
+        public int movesWithoutCapture = 0;      // счётчик полуходов без рубки
         public void MakeMove(Point cursor, int sizePlace)
         {
             // определяем индексы клетки в матрице игры
@@ -304,13 +308,20 @@ namespace Checkers
                 }  
             }
             var val=buffer[indexPath][0].Value;
+            bool IsKill = false;
             //идем по пути
             for (int i = 1; i < buffer[indexPath].Count-1; i++)
             {
                 if (buffer[indexPath][i].Value == -1 || buffer[indexPath][i].Value == -2)
+                {
                     countBlack--;
+                    IsKill=true;
+                }
                 else if (buffer[indexPath][i].Value == 1 || buffer[indexPath][i].Value == 2)
+                {
                     countWhite--;
+                    IsKill = true;
+                }
                 //проверка, что шашка может стать дамкой - могли прошмыгнуть ту сторону
                 if (current_step == CurrentStep.White && buffer[indexPath][i].Number < 9)
                     val = 2;
@@ -327,7 +338,135 @@ namespace Checkers
                 val=current_step==CurrentStep.White ? 2 : -2;
             }
             buffer[indexPath][buffer[indexPath].Count - 1].Value = val;
+
+            // Обновляем счётчики
+            if (IsKill)
+                movesWithoutCapture = 0;
+            else
+                movesWithoutCapture++;
+
         }
+        //для инс
+        public void MakeMove(List<Node> steps)
+        {
+            int index_i, index_j;
+            var val = steps[0].Value;
+            //идем по пути
+            for (int i = 1; i < steps.Count - 1; i++)
+            {
+                //проверка, что шашка может стать дамкой - могли прошмыгнуть ту сторону
+                if (current_step == CurrentStep.White && steps[i].Number < 9)
+                    val = 2;
+                else if (current_step == CurrentStep.Black && steps[i].Number > 56)
+                    val = -2;
+                steps[i].IndexInMtx(out index_i, out index_j);
+                game_place[index_i, index_j].Value = 0;
+            }
+            steps[0].IndexInMtx(out index_i, out index_j);
+            game_place[index_i, index_j].Value = 0;
+            //если четко встали на противоположную сторону
+            if ((current_step == CurrentStep.Black && steps[steps.Count - 1].Number > 56)
+                || (current_step == CurrentStep.White && steps[steps.Count - 1].Number < 9))
+            {
+                val = current_step == CurrentStep.White ? 2 : -2;
+            }
+            steps[steps.Count - 1].IndexInMtx(out index_i, out index_j);
+            game_place[index_i, index_j].Value = val;
+        }
+
+
+        //для оценки
+        //функция для обучения -> передается доска, ходы, текущий ход и доска изменяется в соответствие с ходами
+        public static void MakeMove(Node[,]game_place, List<Node>steps, CurrentStep currentStep)
+        {
+            int index_i,index_j;
+            var val = steps[0].Value;
+            //идем по пути
+            for (int i = 1; i < steps.Count - 1; i++)
+            {
+                //проверка, что шашка может стать дамкой - могли прошмыгнуть ту сторону
+                if (currentStep == CurrentStep.White && steps[i].Number < 9)
+                    val = 2;
+                else if (currentStep == CurrentStep.Black && steps[i].Number > 56)
+                    val = -2;
+                steps[i].IndexInMtx(out index_i, out index_j);
+                game_place[index_i, index_j].Value = 0;
+            }
+            steps[0].IndexInMtx(out index_i, out index_j);
+            game_place[index_i, index_j].Value = 0;
+            //если четко встали на противоположную сторону
+            if ((currentStep == CurrentStep.Black && steps[steps.Count - 1].Number > 56)
+                || (currentStep == CurrentStep.White && steps[steps.Count - 1].Number < 9))
+            {
+                val = currentStep == CurrentStep.White ? 2 : -2;
+            }
+            steps[steps.Count - 1].IndexInMtx(out index_i, out index_j);
+            game_place[index_i, index_j].Value = val;
+        }
+
+        //функция поверхностного копирования всего игрового поля, создается полная копия
+        public static Node[,] CopyGamePlace(Node[,] game_place)
+        {
+            Node[,]copy=new Node[game_place.GetLength(0), game_place.GetLength(1)];
+            //создаем игровое поле
+            int count = 1;
+            for (int i = 0; i < copy.GetUpperBound(0) + 1; i++)
+            {
+                for (int j = 0; j < copy.GetUpperBound(1) + 1; j++)
+                {
+                    copy[i, j] = new Node(0, count++);
+                }
+            }
+            //заполняем поле
+            for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
+            {
+                for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
+                {
+                    copy[i,j].Value=game_place[i,j].Value;
+                }
+            }
+
+            //настраиваем связи
+            for (int i = 0; i < copy.GetUpperBound(0) + 1; i++)
+            {
+                for (int j = 0; j < copy.GetUpperBound(1) + 1; j++)
+                {
+                    //верхняя строка - добавляем соседей cо строки ниже
+                    if (i == 0 && j % 2 != 0)
+                    {
+                        if (j - 1 >= 0)
+                            copy[i, j].neighbors.Add(copy[i + 1, j - 1]);
+                        if (j + 1 <= copy.GetUpperBound(1))
+                            copy[i, j].neighbors.Add(copy[i + 1, j + 1]);
+                    }
+                    //нижняя строка -добавляем соседей со строки выше
+                    else if (i == copy.GetUpperBound(0) && j % 2 == 0)
+                    {
+                        if (j - 1 >= 0)
+                            copy[i, j].neighbors.Add(copy[i - 1, j - 1]);
+                        if (j + 1 <= copy.GetUpperBound(1))
+                            copy[i, j].neighbors.Add(copy[i - 1, j + 1]);
+                    }
+                    //у этих соседи и сверху, и снизу
+                    else if (i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0)
+                    {
+                        if (j - 1 >= 0)
+                        {
+                            copy[i, j].neighbors.Add(copy[i + 1, j - 1]);
+                            copy[i, j].neighbors.Add(copy[i - 1, j - 1]);
+                        }
+                        if (j + 1 <= copy.GetUpperBound(1))
+                        {
+                            copy[i, j].neighbors.Add(copy[i + 1, j + 1]);
+                            copy[i, j].neighbors.Add(copy[i - 1, j + 1]);
+                        }
+                    }
+                }
+            }
+            return copy;
+        }
+
+
         //функция сброса возможного хода
         public void ResetPossibleStep()
         {
@@ -368,9 +507,11 @@ namespace Checkers
             }
             return false;
         }
-        public List<Node> All_Possible_Move()
+        //функция определяет все шашки, которыми сейчас можно сходить - нужна для ИНС
+        public Dictionary<Node, List<List<Node>>> All_Possible_Move()
         { 
-            List<Node> steps= new List<Node>();
+            //список пар: ключ- какой шашкой можно сходить, значение список ходов, которые можно сделать этой шашкой
+            Dictionary<Node,List<List<Node>>> steps= new Dictionary<Node, List<List<Node>>>();
             for (int i = 0; i < game_place.GetLength(0); i++)
             {
                 for (int j = 0; j < game_place.GetLength(1); j++)
@@ -379,17 +520,57 @@ namespace Checkers
                     if ((game_place[i, j].Value == 1 || game_place[i, j].Value == 2) && current_step == CurrentStep.White)
                     {
                         if (CheckPossibleStep(in i, in j))
-                            steps.Add(game_place[i, j]);
+                        { 
+                            Node key=game_place[i, j];//это ключ пары
+                            //теперь надо определить значение, -> куда можно сходить данной шашкой
+                            SetPossibleStep(key);
+                            //в buffer2 находится возможные пути
+                            List<List<Node>> value= new List<List<Node>>();
+                            foreach (var lst in buffer2)
+                            {
+                                value.Add(new List<Node>());
+                                foreach (var node in lst)
+                                {
+                                    value[value.Count - 1].Add(new Node(node.Value, node.Number));
+                                }
+                            }
+                            steps[key]=value;
+                            ResetPossibleStep();
+                        }
+
                     }
                     //проверяем ходы для черных
                     else if ((game_place[i, j].Value == -1 || game_place[i, j].Value == -2) && current_step == CurrentStep.Black)
                     {
                         if (CheckPossibleStep(in i, in j))
-                            steps.Add(game_place[i, j]);
+                        {
+                            Node key = game_place[i, j];//это ключ пары
+                            //теперь надо определить значение, -> куда можно сходить данной шашкой
+                            SetPossibleStep(key);
+                            //в buffer2 находится возможные пути
+                            List<List<Node>> value = new List<List<Node>>();
+                            foreach (var lst in buffer2)
+                            {
+                                value.Add(new List<Node>());
+                                foreach (var node in lst)
+                                {
+                                    value[value.Count - 1].Add(new Node(node.Value, node.Number));
+                                }
+                            }
+                            steps[key] = value;
+                            ResetPossibleStep();
+                        }
                     }
                 }
             }
             return steps;
+        }
+        // это для ИНС
+        List<List<Node>> buffer2;
+        public void SetPossibleStep(Node checker)
+        {
+            //принимаем список путей из текущей клетки
+            buffer2 = Checker.SetPossibleStep(checker, game_place, in current_step);
         }
     }
 }

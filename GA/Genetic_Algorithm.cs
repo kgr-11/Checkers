@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Devices;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -162,7 +164,79 @@ namespace Checkers.GA
 
         private static Network? Competition(Network WhiteNet, Network BlackNet)
         {
+            //создаем сервис игры
+            Service service = new Service();
+
+            var currNetwork = WhiteNet;
+            //сети начинают играть
+            while (true)
+            {
+                // 1. получаем все возможные ходы
+                var possibleStep = service.All_Possible_Move();//шашки, которыми сейчас можно сходить
+                if (possibleStep.Count == 0)//победил соперник
+                {
+                    if(currNetwork==WhiteNet)//сейчас ходят белые, а ходов нет - победили черные
+                        return BlackNet;
+                    else  //сейчас ходят черные, а ходов нет -> победили белые
+                        return WhiteNet;
+                }
+
+                // 2. выбираем лучший ход из возможных
+                //key - пара: key- индекс шашки которой можно сходить, value - индекс хода из массива ходов этой шашкой
+                //value - оценка этого хода
+                Dictionary<KeyValuePair<Node, int>, double> Scores = new Dictionary<KeyValuePair<Node, int>, double>();//оценки каждого хода из possibleStep
+                                                                                                                       //перебор возможных ходов
+                foreach (var Checker in possibleStep)
+                {
+                    for (int j = 0; j < Checker.Value.Count; j++)
+                    {
+                        var path = Checker.Value[j];
+                        //создаем копию доски - изменяя ее, никак не изменим исходную доску
+                        var copy_game_place = Service.CopyGamePlace(service.game_place);
+                        //делаем ход на копированной доске
+                        Service.MakeMove(copy_game_place, path, service.current_step);
+                        //преобразуем доску в список 
+                        var cond = Genetic_Algorithm.Condition(copy_game_place);
+                        //делаем прямой проход
+                        var sc = currNetwork.Forward(cond);//получаем оценку этого хода
+                                                        //запоминаем оценку
+                        Scores[new KeyValuePair<Node, int>(Checker.Key, j)] = sc;
+                    }
+                }
+                //находим лучший ход
+                var minKey = Scores
+                             .OrderBy(pair => pair.Value)      // Сортируем по значению
+                             .Select(pair => pair.Key)         // Берем только ключи
+                             .FirstOrDefault();                // Берем первый (самый минимальный)
+
+                //на этом этапе знаем пару индексов = какой шашкой ходить и какой именно ход ей делать
+                // 3. делаем ход
+                //делаем окончательный ход на игровой доске
+                service.MakeMove(possibleStep[minKey.Key][minKey.Value]);
+                // 4. конце смена хода
+                service.ChangePace();
+                if (service.movesWithoutCapture >= 30)// если 15 ходов без взятия -> ничья
+                {
+                    return null;
+                }
+                currNetwork=currNetwork==WhiteNet?BlackNet:WhiteNet;
+            }
             return null;
+        }
+        public static List<double> Condition(Node[,] game_place)
+        {
+            List<double> currentCondition = new List<double>();//текущее состояние
+            for (int i = 0; i < game_place.GetUpperBound(0) + 1; i++)
+            {
+                for (int j = 0; j < game_place.GetUpperBound(1) + 1; j++)
+                {
+                    if ((j + 1) % 2 == 0 && (i + 1) % 2 != 0 || (j + 1) % 2 != 0 && (i + 1) % 2 == 0)
+                    {
+                        currentCondition.Add(game_place[i, j].Value);
+                    }
+                }
+            }
+            return currentCondition;
         }
         
     }
